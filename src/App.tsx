@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute, AdminRoute } from '@/components/ProtectedRoute';
+import { useProfile } from '@/hooks/useAuth';
+import { useAppSelector } from '@/store';
 import MainLayout from '@/layouts/MainLayout';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
@@ -16,6 +19,16 @@ import AdminLoans from '@/pages/admin/AdminLoans';
 import AdminUsers from '@/pages/admin/AdminUsers';
 
 export default function App() {
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { refetch } = useProfile();
+
+  // Auto-fetch profile on mount if authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      refetch();
+    }
+  }, [isAuthenticated, refetch]);
+
   return (
     <Routes>
       {/* Public routes */}
