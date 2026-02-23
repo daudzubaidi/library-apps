@@ -1,127 +1,129 @@
-# Library App - Booky
+# Booky - Library Management System
 
-Modern library management application built with React, TypeScript, and Vite.
+A modern, full-stack library management application built with React, TypeScript, and Vite.
 
-## Tech Stack
+## Technology Stack
 
-- **Frontend**: React 19 + TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS v4 with Figma Design Tokens
-- **State Management**: Redux Toolkit
-- **Data Fetching**: TanStack Query v5
-- **Routing**: React Router v7
-- **UI Components**: shadcn/ui
-- **Icons**: Lucide React
-- **Toast**: Sonner
+- React 19 with TypeScript for type-safe development
+- Vite for fast build tooling and hot module replacement
+- Tailwind CSS v4 with custom design tokens from Figma
+- Redux Toolkit for predictable state management
+- TanStack Query v5 for server state management
+- React Router v7 for client-side routing
+- shadcn/ui for accessible UI components
+- Lucide React for consistent iconography
 
 ## Features
 
-### Phase 1: Project Setup + Design System (Completed)
-- Vite + React + TypeScript setup
-- Tailwind CSS v4 configuration
-- Exact Figma design tokens (colors, typography, spacing, radius)
-- Quicksand font integration
-- Redux store setup (auth, cart, ui slices)
-- shadcn/ui components
+### User Authentication
+- Secure login and registration system
+- JWT token-based authentication
+- Persistent sessions with localStorage
+- Automatic profile fetching
 
-### Phase 2: Authentication (Completed)
-- Login page with email/password
-- Register page with full form validation
-- Token-based authentication with localStorage persistence
-- Auto-fetch user profile on mount
-- Pixel-perfect design matching Figma
-- Proper Booky logo with sparkle icon
+### Book Browsing
+- Responsive book catalog with grid layout
+- Real-time search functionality
+- Category-based filtering
+- Pagination for large datasets
+- Book ratings and availability status
 
-### Phase 3: Book List + Search/Filter (Completed)
-- Books listing page with responsive grid (1-4 columns)
-- Search bar with real-time query
-- Category filter with dynamic loading
-- Book cards with:
-  - Cover image
-  - Title, author, rating
-  - Stock availability status
-- Pagination with numbered buttons
-- Loading and empty states
-- Redux integration for search/filter state
-- TanStack Query for data fetching and caching
+### Book Details
+- Comprehensive book information display
+- Add to cart functionality
+- User reviews and ratings
+- Related books recommendations
 
-## Development
+### Shopping Cart
+- Add/remove books from cart
+- Cart persistence across sessions
+- Checkout process
+
+### User Dashboard
+- Personal loan history
+- Active and returned loans
+- Overdue notifications
+- Review management
+
+### Admin Panel
+- Book inventory management
+- User management
+- Loan tracking and management
+- System overview and statistics
+
+## Getting Started
+
+### Prerequisites
+- Node.js 18+ and npm
+
+### Installation
 
 ```bash
-# Install dependencies
 npm install
+```
 
-# Run development server
+### Development
+
+```bash
 npm run dev
+```
 
-# Build for production
+### Production Build
+
+```bash
 npm run build
-
-# Preview production build
 npm run preview
-
-# Type check
-npm run build
 ```
 
 ## Project Structure
 
 ```
 src/
-├── api/           # API client and endpoints
-├── components/    # Reusable components (Logo, UI components)
-├── hooks/         # Custom React hooks (useAuth, etc.)
-├── layouts/       # Layout components (MainLayout)
-├── pages/         # Page components (Login, Register, Books, etc.)
-├── store/         # Redux store and slices
-├── types/         # TypeScript type definitions
-└── index.css      # Global styles with Figma design tokens
+├── api/           # API integration layer
+├── components/    # Reusable UI components
+├── hooks/         # Custom React hooks
+├── layouts/       # Page layout components
+├── pages/         # Application pages
+├── store/         # Redux state management
+├── types/         # TypeScript definitions
+└── index.css      # Global styles and design tokens
 ```
 
-## Design Tokens
+## Environment Configuration
 
-All design tokens are extracted from Figma and defined in `src/index.css`:
-
-- **Typography**: Quicksand font family with exact sizes and line heights
-- **Colors**: Neutral scale, Primary blue, Brand purple, Accent colors
-- **Spacing**: 0px to 160px scale
-- **Border Radius**: 0px to 9999px (full)
-- **Shadows**: xs and lg shadows from Figma
-
-## Environment Variables
-
-Create a `.env` file:
+Create a `.env` file in the root directory:
 
 ```env
-VITE_API_BASE_URL=your_api_url
+VITE_API_BASE_URL=your_api_endpoint
 ```
+
+## Design System
+
+The application uses a custom design system with tokens extracted from Figma:
+
+- Typography: Quicksand font family
+- Color palette: Neutral, Primary, Brand, and Accent scales
+- Spacing: Consistent 8px grid system
+- Border radius: Predefined radius values
+- Shadows: Elevation system for depth
+
+## Code Quality
+
+- TypeScript for type safety
+- ESLint for code linting
+- Prettier for code formatting
+- Component-driven architecture
+- Separation of concerns
+- Performance optimizations
 
 ## Deployment
 
-This project is configured for Vercel deployment with automatic builds on push.
-
-## Best Practices
-
-- Pixel-perfect Figma implementation
-- Type-safe with TypeScript
-- Modern React patterns (hooks, functional components)
-- Clean code, no over-engineering
-- Responsive design
-- Performance optimized with TanStack Query caching
-- Proper error handling and loading states
-
-## Next Phases
-
-- Phase 4: Book Detail + Reviews
-- Phase 5: Cart + Checkout
-- Phase 6: My Loans + My Profile
-- Phase 7: Admin Dashboard
-- Phase 8: Testing + Deployment
+Optimized for deployment on Vercel with automatic builds and previews.
 
 ## License
 
 MIT
 
-## Author
+---
 
-Built with React, TypeScript, and Vite
+Built with modern web technologies and best practices.
