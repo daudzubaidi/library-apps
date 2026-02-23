@@ -28,15 +28,19 @@ export function useRegister() {
 
 export function useProfile() {
   const dispatch = useDispatch();
-  return useQuery({
+  const query = useQuery({
     queryKey: ['profile'],
     queryFn: getProfile,
-    onSuccess: (data) => {
-      dispatch(setUser(data));
-    },
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  // Dispatch setUser when data changes (TanStack Query v5 pattern)
+  if (query.data) {
+    dispatch(setUser(query.data));
+  }
+
+  return query;
 }
 
 export function useLogout() {
