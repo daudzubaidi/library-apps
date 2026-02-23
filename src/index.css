@@ -1,0 +1,302 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* Font Family - Exact from Figma */
+  --font-family-quicksand: "Quicksand", sans-serif;
+
+  /* Font Sizes - Exact from Figma (px values) */
+  --font-size-display-3xl: 56px;
+  --font-size-display-2xl: 48px;
+  --font-size-display-xl: 60px;
+  --font-size-display-lg: 36px;
+  --font-size-display-md: 32px;
+  --font-size-display-sm: 28px;
+  --font-size-display-xs: 24px;
+  --font-size-text-xl: 20px;
+  --font-size-text-lg: 18px;
+  --font-size-text-md: 16px;
+  --font-size-text-sm: 14px;
+  --font-size-text-xs: 12px;
+
+  /* Line Heights - Exact from Figma (px values) */
+  --line-height-display-3xl: 68px;
+  --line-height-display-2xl: 60px;
+  --line-height-display-xl: 72px;
+  --line-height-display-lg: 44px;
+  --line-height-display-md: 42px;
+  --line-height-display-sm: 38px;
+  --line-height-display-xs: 36px;
+  --line-height-text-xl: 34px;
+  --line-height-text-lg: 32px;
+  --line-height-text-md: 30px;
+  --line-height-text-sm: 28px;
+  --line-height-text-xs: 24px;
+
+  /* Font Weights - Exact from Figma */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* Spacing Scale - Exact from Figma (px values) */
+  --spacing-none: 0px;
+  --spacing-xxs: 2px;
+  --spacing-xs: 4px;
+  --spacing-1-5: 6px;
+  --spacing-md: 8px;
+  --spacing-lg: 12px;
+  --spacing-xl: 16px;
+  --spacing-2xl: 20px;
+  --spacing-3xl: 24px;
+  --spacing-4xl: 32px;
+  --spacing-5xl: 40px;
+  --spacing-6xl: 48px;
+  --spacing-7xl: 64px;
+  --spacing-8xl: 80px;
+  --spacing-9xl: 96px;
+  --spacing-10xl: 128px;
+  --spacing-11xl: 160px;
+
+  /* Border Radius - Exact from Figma (px values) */
+  --radius-none: 0px;
+  --radius-xxs: 2px;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 20px;
+  --radius-4xl: 24px;
+  --radius-full: 9999px;
+
+  /* Widths - Exact from Figma (px values) */
+  --width-2xl: 1024px;
+  --paragraph-max-width: 720px;
+
+  /* Colors - Neutral Scale - Exact hex from Figma */
+  --color-neutral-25: #fdfdfd;
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e9eaeb;
+  --color-neutral-300: #d5d7da;
+  --color-neutral-400: #a4a7ae;
+  --color-neutral-500: #717680;
+  --color-neutral-600: #535862;
+  --color-neutral-700: #414651;
+  --color-neutral-800: #252b37;
+  --color-neutral-900: #181d27;
+  --color-neutral-950: #0a0d12;
+
+  /* Colors - Primary/Blue Scale - Exact hex from Figma */
+  --color-primary-100: #f6f9fe;
+  --color-primary-200: #d2e3ff;
+  --color-primary-300: #1c65da;
+
+  /* Colors - Brand Purple - Exact hex from Figma */
+  --color-brand-700: #6941c6;
+  --color-brand-primary: #7f56d9;
+
+  /* Colors - Accent - Exact hex from Figma */
+  --color-accent-red: #d9206e;
+  --color-accent-green: #079455;
+  --color-accent-yellow: #fdb022;
+
+  /* Colors - Base - Exact hex from Figma */
+  --color-base-white: #ffffff;
+  --color-base-black: #000000;
+
+  /* Semantic Colors - Background */
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #fafafa;
+
+  /* Semantic Colors - Text */
+  --color-text-primary: #181d27;
+  --color-text-tertiary: #535862;
+
+  /* Semantic Colors - Border */
+  --color-border-primary: #d5d7da;
+  --color-border-secondary: #e9eaeb;
+
+  /* Semantic Colors - Foreground */
+  --color-fg-brand-primary: #7f56d9;
+
+  /* Shadow Effects - from Figma */
+  --shadow-xs-color: rgba(10, 13, 18, 0.05);
+
+  /* Legacy Shadcn mappings for compatibility */
+  --radius: 10px;
+  --background: var(--color-background-primary);
+  --foreground: var(--color-text-primary);
+  --card: var(--color-background-primary);
+  --card-foreground: var(--color-text-primary);
+  --popover: var(--color-background-primary);
+  --popover-foreground: var(--color-text-primary);
+  --primary: var(--color-primary-300);
+  --primary-foreground: var(--color-base-white);
+  --secondary: var(--color-neutral-100);
+  --secondary-foreground: var(--color-text-primary);
+  --muted: var(--color-neutral-100);
+  --muted-foreground: var(--color-neutral-600);
+  --accent: var(--color-neutral-100);
+  --accent-foreground: var(--color-text-primary);
+  --destructive: var(--color-accent-red);
+  --border: var(--color-border-primary);
+  --input: var(--color-border-primary);
+  --ring: var(--color-neutral-600);
+}
+
+:root {
+  /* Set default font family to Quicksand */
+  font-family: var(--font-family-quicksand);
+
+  /* Light mode colors - using Figma exact values */
+  --radius: 10px;
+  --background: var(--color-background-primary);
+  --foreground: var(--color-text-primary);
+  --card: var(--color-background-primary);
+  --card-foreground: var(--color-text-primary);
+  --popover: var(--color-background-primary);
+  --popover-foreground: var(--color-text-primary);
+  --primary: var(--color-primary-300);
+  --primary-foreground: var(--color-base-white);
+  --secondary: var(--color-neutral-100);
+  --secondary-foreground: var(--color-text-primary);
+  --muted: var(--color-neutral-100);
+  --muted-foreground: var(--color-neutral-600);
+  --accent: var(--color-neutral-100);
+  --accent-foreground: var(--color-text-primary);
+  --destructive: var(--color-accent-red);
+  --border: var(--color-border-primary);
+  --input: var(--color-border-primary);
+  --ring: var(--color-neutral-600);
+}
+
+.dark {
+  /* Dark mode using neutral scale */
+  --background: var(--color-neutral-950);
+  --foreground: var(--color-neutral-25);
+  --card: var(--color-neutral-900);
+  --card-foreground: var(--color-neutral-25);
+  --popover: var(--color-neutral-900);
+  --popover-foreground: var(--color-neutral-25);
+  --primary: var(--color-primary-200);
+  --primary-foreground: var(--color-neutral-900);
+  --secondary: var(--color-neutral-800);
+  --secondary-foreground: var(--color-neutral-25);
+  --muted: var(--color-neutral-800);
+  --muted-foreground: var(--color-neutral-400);
+  --accent: var(--color-neutral-800);
+  --accent-foreground: var(--color-neutral-25);
+  --border: var(--color-neutral-800);
+  --input: var(--color-neutral-800);
+  --ring: var(--color-neutral-400);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-family-quicksand);
+  }
+
+  /* Typography Utilities - Exact from Figma */
+  .text-display-3xl {
+    font-size: var(--font-size-display-3xl);
+    line-height: var(--line-height-display-3xl);
+    font-family: var(--font-family-quicksand);
+  }
+
+  .text-display-2xl {
+    font-size: var(--font-size-display-2xl);
+    line-height: var(--line-height-display-2xl);
+    font-family: var(--font-family-quicksand);
+  }
+
+  .text-display-xl {
+    font-size: var(--font-size-display-xl);
+    line-height: var(--line-height-display-xl);
+    font-family: var(--font-family-quicksand);
+  }
+
+  .text-display-lg {
+    font-size: var(--font-size-display-lg);
+    line-height: var(--line-height-display-lg);
+    font-family: var(--font-family-quicksand);
+  }
+
+  .text-display-md {
+    font-size: var(--font-size-display-md);
+    line-height: var(--line-height-display-md);
+    font-family: var(--font-family-quicksand);
+  }
+
+  .text-display-sm {
+    font-size: var(--font-size-display-sm);
+    line-height: var(--line-height-display-sm);
+    font-family: var(--font-family-quicksand);
+  }
+
+  .text-display-xs {
+    font-size: var(--font-size-display-xs);
+    line-height: var(--line-height-display-xs);
+    font-family: var(--font-family-quicksand);
+  }
+
+  .text-xl {
+    font-size: var(--font-size-text-xl);
+    line-height: var(--line-height-text-xl);
+    font-family: var(--font-family-quicksand);
+  }
+
+  .text-lg {
+    font-size: var(--font-size-text-lg);
+    line-height: var(--line-height-text-lg);
+    font-family: var(--font-family-quicksand);
+  }
+
+  .text-md {
+    font-size: var(--font-size-text-md);
+    line-height: var(--line-height-text-md);
+    font-family: var(--font-family-quicksand);
+  }
+
+  .text-sm {
+    font-size: var(--font-size-text-sm);
+    line-height: var(--line-height-text-sm);
+    font-family: var(--font-family-quicksand);
+  }
+
+  .text-xs {
+    font-size: var(--font-size-text-xs);
+    line-height: var(--line-height-text-xs);
+    font-family: var(--font-family-quicksand);
+  }
+
+  /* Font Weight Utilities */
+  .font-regular { font-weight: var(--font-weight-regular); }
+  .font-medium { font-weight: var(--font-weight-medium); }
+  .font-semibold { font-weight: var(--font-weight-semibold); }
+  .font-bold { font-weight: var(--font-weight-bold); }
+  .font-extrabold { font-weight: var(--font-weight-extrabold); }
+
+  /* Shadow Utilities - from Figma */
+  .shadow-xs {
+    box-shadow: 0px 1px 2px 0px var(--shadow-xs-color);
+  }
+
+  .shadow-lg {
+    box-shadow:
+      0px 2px 2px -1px rgba(10, 13, 18, 0.04),
+      0px 4px 6px -2px rgba(10, 13, 18, 0.03),
+      0px 12px 16px -4px rgba(10, 13, 18, 0.08);
+  }
+}
