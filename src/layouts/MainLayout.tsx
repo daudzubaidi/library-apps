@@ -2,7 +2,7 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '@/store';
 import { logout } from '@/store/authSlice';
-import { BookOpen, ShoppingCart, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { ShoppingCart, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import Logo from '@/components/Logo';
 
 export default function MainLayout() {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -37,8 +38,8 @@ export default function MainLayout() {
         <div className="container mx-auto flex h-14 items-center justify-between px-4">
           <div className="flex items-center gap-6">
             <Link to="/books" className="flex items-center gap-2 font-semibold">
-              <BookOpen className="h-5 w-5" />
-              Library
+              <div className="scale-75"><Logo /></div>
+              Booky
             </Link>
             <nav className="hidden md:flex items-center gap-4 text-sm">
               <Link to="/books" className="text-muted-foreground hover:text-foreground transition-colors">

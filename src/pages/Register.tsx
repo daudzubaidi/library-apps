@@ -4,15 +4,7 @@ import { useAppDispatch } from '../store';
 import { setCredentials } from '../store/authSlice';
 import { useRegisterMutation } from '../hooks/useAuth';
 import { toast } from 'sonner';
-
-// Logo & Eye icon sama dengan Login page
-const LogoIcon = () => (
-  <svg width="33" height="33" viewBox="0 0 33 33" fill="none">
-    <rect width="33" height="33" rx="8" fill="url(#paint0_linear)" />
-    <path d="M8 16.5C8 11.8056 11.8056 8 16.5 8C21.1944 8 25 11.8056 25 16.5C25 21.1944 21.1944 25 16.5 25C11.8056 25 8 21.1944 8 16.5Z" fill="white" />
-    <defs><linearGradient id="paint0_linear" x1="0" y1="0" x2="33" y2="33"><stop stopColor="#7F56D9" /><stop offset="1" stopColor="#6941C6" /></linearGradient></defs>
-  </svg>
-);
+import Logo from '../components/Logo';
 
 const EyeIcon = () => (
   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -65,7 +57,7 @@ export default function Register() {
     <div className="relative min-h-screen w-full bg-white flex items-center justify-center">
       <div className="flex w-[400px] flex-col gap-[20px]">
         <div className="flex items-center gap-[11.786px]">
-          <div className="h-[33px] w-[33px]"><LogoIcon /></div>
+          <Logo />
           <p className="text-[25.143px] font-bold leading-[33px]" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}>Booky</p>
         </div>
 
