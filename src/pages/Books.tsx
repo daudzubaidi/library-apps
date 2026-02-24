@@ -5,7 +5,8 @@ import { useAppSelector, useAppDispatch } from '@/store';
 import { setSearchQuery, setSelectedCategoryId } from '@/store/uiSlice';
 import { getBooks } from '@/api/books';
 import { getCategories } from '@/api/categories';
-import { Search } from 'lucide-react';
+import { Search, AlertCircle } from 'lucide-react';
+import { BookCardSkeleton } from '@/components/Skeleton';
 
 export default function Books() {
   const dispatch = useAppDispatch();
@@ -17,7 +18,7 @@ export default function Books() {
     queryFn: getCategories,
   });
 
-  const { data: booksData, isLoading } = useQuery({
+  const { data: booksData, isLoading, isError, refetch } = useQuery({
     queryKey: ['books', { q: searchQuery, categoryId: selectedCategoryId, page }],
     queryFn: () => getBooks({ q: searchQuery, categoryId: selectedCategoryId || undefined, page, limit: 12 }),
   });
@@ -86,10 +87,22 @@ export default function Books() {
 
       {/* Books Grid */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-[64px]">
-          <div className="text-md font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>
-            Loading...
-          </div>
+        <div className="grid grid-cols-1 gap-[24px] sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 12 }).map((_, i) => <BookCardSkeleton key={i} />)}
+        </div>
+      ) : isError ? (
+        <div className="flex flex-col items-center justify-center gap-[16px] py-[64px]">
+          <AlertCircle className="h-[48px] w-[48px] text-[var(--color-accent-red)]" />
+          <p className="text-md font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>
+            Failed to load books
+          </p>
+          <button
+            onClick={() => refetch()}
+            className="flex h-[40px] items-center justify-center rounded-[100px] px-[24px] text-sm font-bold"
+            style={{ backgroundColor: 'var(--color-primary-300)', color: 'var(--color-neutral-25)', fontFamily: 'var(--font-family-quicksand)' }}
+          >
+            Try again
+          </button>
         </div>
       ) : booksData?.data.length === 0 ? (
         <div className="flex items-center justify-center py-[64px]">

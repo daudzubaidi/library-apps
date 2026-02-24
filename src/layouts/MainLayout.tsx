@@ -1,8 +1,9 @@
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '@/store';
 import { logout } from '@/store/authSlice';
-import { ShoppingCart, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { ShoppingCart, User, LogOut, LayoutDashboard, Menu, X, BookOpen, ClipboardList } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -11,14 +12,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Logo from '@/components/Logo';
+
+const NAV_LINKS = [
+  { label: 'Books', path: '/books', icon: BookOpen },
+  { label: 'My Loans', path: '/my-loans', icon: ClipboardList },
+];
 
 export default function MainLayout() {
   const { user } = useSelector((state: RootState) => state.auth);
   const cartCount = useSelector((state: RootState) => state.cart.itemCount);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -36,25 +44,51 @@ export default function MainLayout() {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-14 items-center justify-between px-4">
+          {/* Left: Logo + Desktop Nav */}
           <div className="flex items-center gap-6">
             <Link to="/books" className="flex items-center gap-2 font-semibold">
               <div className="scale-75"><Logo /></div>
-              Booky
+              <span
+                className="hidden sm:block font-bold"
+                style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}
+              >
+                Booky
+              </span>
             </Link>
             <nav className="hidden md:flex items-center gap-4 text-sm">
-              <Link to="/books" className="text-muted-foreground hover:text-foreground transition-colors">
-                Books
-              </Link>
-              <Link to="/my-loans" className="text-muted-foreground hover:text-foreground transition-colors">
-                My Loans
-              </Link>
+              {NAV_LINKS.map(({ label, path }) => (
+                <Link
+                  key={path}
+                  to={path}
+                  className="font-semibold transition-colors"
+                  style={{
+                    fontFamily: 'var(--font-family-quicksand)',
+                    color: location.pathname.startsWith(path)
+                      ? 'var(--color-primary-300)'
+                      : 'var(--color-neutral-600)',
+                  }}
+                >
+                  {label}
+                </Link>
+              ))}
               {user?.role === 'ADMIN' && (
-                <Link to="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link
+                  to="/admin"
+                  className="font-semibold transition-colors"
+                  style={{
+                    fontFamily: 'var(--font-family-quicksand)',
+                    color: location.pathname.startsWith('/admin')
+                      ? 'var(--color-primary-300)'
+                      : 'var(--color-neutral-600)',
+                  }}
+                >
                   Admin
                 </Link>
               )}
             </nav>
           </div>
+
+          {/* Right: Cart + User + Mobile Hamburger */}
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" asChild className="relative">
               <Link to="/cart">
@@ -66,10 +100,12 @@ export default function MainLayout() {
                 )}
               </Link>
             </Button>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-full">
                   <Avatar className="h-8 w-8">
+                    {user?.profilePhoto && <AvatarImage src={user.profilePhoto} alt={user.name} />}
                     <AvatarFallback className="text-xs">{initials}</AvatarFallback>
                   </Avatar>
                 </Button>
@@ -95,9 +131,67 @@ export default function MainLayout() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {/* Mobile Hamburger */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen((v) => !v)}
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
           </div>
         </div>
+
+        {/* Mobile Nav Drawer */}
+        {mobileMenuOpen && (
+          <div className="border-t bg-background px-4 py-3 md:hidden">
+            <nav className="flex flex-col gap-1">
+              {NAV_LINKS.map(({ label, path, icon: Icon }) => (
+                <Link
+                  key={path}
+                  to={path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 rounded-[12px] px-[12px] py-[10px] text-sm font-semibold transition-colors"
+                  style={{
+                    fontFamily: 'var(--font-family-quicksand)',
+                    backgroundColor: location.pathname.startsWith(path)
+                      ? 'var(--color-primary-100)'
+                      : 'transparent',
+                    color: location.pathname.startsWith(path)
+                      ? 'var(--color-primary-300)'
+                      : 'var(--color-neutral-700)',
+                  }}
+                >
+                  <Icon className="h-4 w-4" />
+                  {label}
+                </Link>
+              ))}
+              {user?.role === 'ADMIN' && (
+                <Link
+                  to="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 rounded-[12px] px-[12px] py-[10px] text-sm font-semibold transition-colors"
+                  style={{
+                    fontFamily: 'var(--font-family-quicksand)',
+                    backgroundColor: location.pathname.startsWith('/admin')
+                      ? 'var(--color-primary-100)'
+                      : 'transparent',
+                    color: location.pathname.startsWith('/admin')
+                      ? 'var(--color-primary-300)'
+                      : 'var(--color-neutral-700)',
+                  }}
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  Admin
+                </Link>
+              )}
+            </nav>
+          </div>
+        )}
       </header>
+
       <main className="container mx-auto px-4 py-6">
         <Outlet />
       </main>

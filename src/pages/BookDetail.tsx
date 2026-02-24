@@ -4,8 +4,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getBook } from '@/api/books';
 import { getBookReviews, createReview } from '@/api/reviews';
 import { addToCart } from '@/api/cart';
-import { ChevronRight, Star } from 'lucide-react';
+import { ChevronRight, Star, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { BookDetailSkeleton } from '@/components/Skeleton';
 
 export default function BookDetail() {
   const { id } = useParams<{ id: string }>();
@@ -13,7 +14,7 @@ export default function BookDetail() {
   const [reviewStar, setReviewStar] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
 
-  const { data: book, isLoading } = useQuery({
+  const { data: book, isLoading, isError } = useQuery({
     queryKey: ['book', id],
     queryFn: () => getBook(Number(id)),
     enabled: !!id,
@@ -42,7 +43,23 @@ export default function BookDetail() {
     },
   });
 
-  if (isLoading || !book) return <div>Loading...</div>;
+  if (isLoading) return <BookDetailSkeleton />;
+
+  if (isError || !book) return (
+    <div className="flex flex-col items-center justify-center gap-[16px] py-[64px]">
+      <AlertCircle className="h-[48px] w-[48px] text-[var(--color-accent-red)]" />
+      <p className="text-md font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>
+        Failed to load book
+      </p>
+      <Link
+        to="/books"
+        className="flex h-[40px] items-center justify-center rounded-[100px] px-[24px] text-sm font-bold"
+        style={{ backgroundColor: 'var(--color-primary-300)', color: 'var(--color-neutral-25)', fontFamily: 'var(--font-family-quicksand)' }}
+      >
+        Back to Books
+      </Link>
+    </div>
+  );
 
   return (
     <div className="flex w-full flex-col gap-[64px]">

@@ -5,6 +5,7 @@ import { getMyReviews } from '@/api/me';
 import { deleteReview } from '@/api/reviews';
 import { Star, Trash2, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
+import { ReviewCardSkeleton } from '@/components/Skeleton';
 
 const TABS = [
   { label: 'Profile', path: '/my-profile' },
@@ -31,9 +32,11 @@ export default function MyReviews() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-[64px]">
-        <div className="text-md font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>
-          Loading...
+      <div className="flex w-full flex-col gap-[32px]">
+        <div className="h-[56px] w-[549px] animate-pulse rounded-[16px] bg-[var(--color-neutral-200)]" />
+        <div className="h-[38px] w-[160px] animate-pulse rounded-[8px] bg-[var(--color-neutral-200)]" />
+        <div className="grid grid-cols-1 gap-[24px] md:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => <ReviewCardSkeleton key={i} />)}
         </div>
       </div>
     );

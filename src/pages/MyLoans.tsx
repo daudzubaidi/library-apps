@@ -6,6 +6,7 @@ import { returnBook } from '@/api/loans';
 import { BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import LoanCard from '@/components/LoanCard';
+import { LoanCardSkeleton } from '@/components/Skeleton';
 
 const TABS = [
   { label: 'Profile', path: '/my-profile' },
@@ -33,9 +34,11 @@ export default function MyLoans() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-[64px]">
-        <div className="text-md font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>
-          Loading...
+      <div className="flex w-full flex-col gap-[32px]">
+        <div className="h-[56px] w-[549px] animate-pulse rounded-[16px] bg-[var(--color-neutral-200)]" />
+        <div className="h-[38px] w-[200px] animate-pulse rounded-[8px] bg-[var(--color-neutral-200)]" />
+        <div className="grid grid-cols-1 gap-[24px]">
+          {Array.from({ length: 3 }).map((_, i) => <LoanCardSkeleton key={i} />)}
         </div>
       </div>
     );
