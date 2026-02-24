@@ -1,12 +1,20 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { getMyLoans } from '@/api/me';
 import { returnBook } from '@/api/loans';
-import { Calendar, BookOpen } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
+import LoanCard from '@/components/LoanCard';
+
+const TABS = [
+  { label: 'Profile', path: '/my-profile' },
+  { label: 'Borrowed List', path: '/my-loans' },
+  { label: 'Reviews', path: '/my-reviews' },
+];
 
 export default function MyLoans() {
+  const location = useLocation();
   const [statusFilter, setStatusFilter] = useState<'all' | 'BORROWED' | 'RETURNED' | 'LATE'>('all');
   const queryClient = useQueryClient();
 
@@ -23,27 +31,6 @@ export default function MyLoans() {
     },
   });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'BORROWED':
-        return 'var(--color-primary-300)';
-      case 'RETURNED':
-        return 'var(--color-accent-green)';
-      case 'LATE':
-        return 'var(--color-accent-red)';
-      default:
-        return 'var(--color-neutral-500)';
-    }
-  };
-
-  const getDaysRemaining = (dueDate: string) => {
-    const due = new Date(dueDate);
-    const today = new Date();
-    const diffTime = due.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-[64px]">
@@ -56,9 +43,34 @@ export default function MyLoans() {
 
   return (
     <div className="flex w-full flex-col gap-[32px]">
+      {/* Tab Navigation */}
+      <div className="flex h-[56px] items-center gap-[8px] rounded-[16px] p-[8px]" style={{ backgroundColor: 'var(--color-neutral-100)', width: 'fit-content' }}>
+        {TABS.map((tab) => {
+          const isActive = location.pathname === tab.path;
+          return (
+            <Link
+              key={tab.path}
+              to={tab.path}
+              className="flex h-[40px] w-[175px] items-center justify-center rounded-[12px] px-[12px] py-[8px] transition-all"
+              style={{
+                backgroundColor: isActive ? 'white' : 'transparent',
+                boxShadow: isActive ? '0px 0px 20px 0px rgba(203,202,202,0.25)' : 'none',
+                fontFamily: 'var(--font-family-quicksand)',
+                fontSize: 'var(--font-size-text-md)',
+                fontWeight: isActive ? 700 : 500,
+                color: isActive ? 'var(--color-neutral-950)' : 'var(--color-neutral-600)',
+                textDecoration: 'none',
+              }}
+            >
+              {tab.label}
+            </Link>
+          );
+        })}
+      </div>
+
       <div className="flex items-center justify-between">
         <h1 className="text-display-sm font-bold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}>
-          My Loans
+          Borrowed List
         </h1>
       </div>
 
@@ -91,104 +103,14 @@ export default function MyLoans() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-[24px]">
-          {loansData?.data.map((loan) => {
-            const daysRemaining = getDaysRemaining(loan.dueDate);
-            return (
-              <div key={loan.id} className="flex gap-[24px] rounded-[12px] border border-solid border-[var(--color-neutral-200)] bg-white p-[24px]">
-                <Link to={`/books/${loan.book.id}`} className="h-[180px] w-[120px] overflow-hidden rounded-[8px] bg-[var(--color-neutral-100)]">
-                  {loan.book.coverImage ? (
-                    <img src={loan.book.coverImage} alt={loan.book.title} className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-xs text-[var(--color-neutral-400)]">No Image</div>
-                  )}
-                </Link>
-
-                <div className="flex flex-1 flex-col justify-between">
-                  <div>
-                    <span
-                      className="mb-[8px] inline-block rounded-[100px] px-[12px] py-[4px] text-sm font-bold"
-                      style={{
-                        fontFamily: 'var(--font-family-quicksand)',
-                        backgroundColor: `${getStatusColor(loan.status)}20`,
-                        color: getStatusColor(loan.status),
-                      }}
-                    >
-                      {loan.status}
-                    </span>
-                    <Link to={`/books/${loan.book.id}`}>
-                      <h3 className="mb-[4px] text-lg font-bold transition-colors hover:text-[var(--color-primary-300)]" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}>
-                        {loan.book.title}
-                      </h3>
-                    </Link>
-                    <p className="mb-[12px] text-sm font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-600)' }}>
-                      {loan.book.author.name}
-                    </p>
-
-                    <div className="flex gap-[24px]">
-                      <div className="flex items-center gap-[8px]">
-                        <Calendar className="h-[16px] w-[16px] text-[var(--color-neutral-500)]" />
-                        <div>
-                          <p className="text-xs font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>
-                            Borrow Date
-                          </p>
-                          <p className="text-sm font-bold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}>
-                            {new Date(loan.borrowDate).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-[8px]">
-                        <Calendar className="h-[16px] w-[16px] text-[var(--color-neutral-500)]" />
-                        <div>
-                          <p className="text-xs font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>
-                            Due Date
-                          </p>
-                          <p className="text-sm font-bold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}>
-                            {new Date(loan.dueDate).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                      {loan.returnDate && (
-                        <div className="flex items-center gap-[8px]">
-                          <Calendar className="h-[16px] w-[16px] text-[var(--color-neutral-500)]" />
-                          <div>
-                            <p className="text-xs font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>
-                              Return Date
-                            </p>
-                            <p className="text-sm font-bold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}>
-                              {new Date(loan.returnDate).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    {loan.status === 'BORROWED' && daysRemaining > 0 && (
-                      <p className="text-sm font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-700)' }}>
-                        {daysRemaining} days remaining
-                      </p>
-                    )}
-                    {loan.status === 'LATE' && (
-                      <p className="text-sm font-bold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-accent-red)' }}>
-                        {Math.abs(daysRemaining)} days overdue
-                      </p>
-                    )}
-                    {loan.status === 'BORROWED' && (
-                      <button
-                        onClick={() => returnBookMutation.mutate(loan.id)}
-                        disabled={returnBookMutation.isPending}
-                        className="ml-auto flex h-[40px] items-center justify-center rounded-[100px] px-[24px] font-bold transition-opacity hover:opacity-90 disabled:opacity-50"
-                        style={{ backgroundColor: 'var(--color-primary-300)', color: 'var(--color-neutral-25)', fontFamily: 'var(--font-family-quicksand)' }}
-                      >
-                        {returnBookMutation.isPending ? 'Returning...' : 'Return Book'}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {loansData?.data.map((loan) => (
+            <LoanCard
+              key={loan.id}
+              loan={loan}
+              onReturn={(id) => returnBookMutation.mutate(id)}
+              isReturning={returnBookMutation.isPending}
+            />
+          ))}
         </div>
       )}
     </div>
