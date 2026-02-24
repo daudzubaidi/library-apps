@@ -7,6 +7,7 @@ import { getProfile, updateProfile } from '@/api/me';
 import { toast } from 'sonner';
 import ProfileForm from '@/components/ProfileForm';
 import LoanStatsCard from '@/components/LoanStatsCard';
+import { Skeleton } from '@/components/Skeleton';
 
 const TABS = [
   { label: 'Profile', path: '/my-profile' },
@@ -76,10 +77,33 @@ export default function MyProfile() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-[64px]">
-        <p className="text-md font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>
-          Loading...
-        </p>
+      <div className="flex w-full flex-col gap-[32px]">
+        {/* Tab nav skeleton */}
+        <Skeleton className="h-[56px] w-[549px] rounded-[16px]" />
+        <Skeleton className="h-[38px] w-[100px]" />
+        {/* Profile card skeleton */}
+        <div className="flex w-full max-w-[557px] flex-col gap-[24px] rounded-[16px] bg-white p-[20px]"
+          style={{ boxShadow: '0px 0px 20px 0px rgba(203,202,202,0.25)' }}>
+          <div className="flex flex-col gap-[12px]">
+            <Skeleton className="h-[64px] w-[64px] rounded-full" />
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center justify-between">
+                <Skeleton className="h-[18px] w-[120px]" />
+                <Skeleton className="h-[18px] w-[160px]" />
+              </div>
+            ))}
+          </div>
+          <Skeleton className="h-[44px] w-full rounded-[100px]" />
+        </div>
+        {/* Stats skeleton */}
+        <div className="grid grid-cols-2 gap-[16px] md:grid-cols-4" style={{ maxWidth: '557px' }}>
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="flex flex-col gap-[4px] rounded-[12px] border border-solid border-[var(--color-neutral-200)] bg-white p-[16px]">
+              <Skeleton className="h-[32px] w-[48px]" />
+              <Skeleton className="h-[16px] w-[80px]" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

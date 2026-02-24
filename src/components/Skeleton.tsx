@@ -88,6 +88,28 @@ export function LoanCardSkeleton() {
   );
 }
 
+export function CartItemSkeleton() {
+  return (
+    <div>
+      <div className="flex gap-[16px]">
+        <Skeleton className="h-[20px] w-[20px] shrink-0 self-center rounded-[4px]" />
+        <Skeleton className="h-[138px] w-[92px] shrink-0 rounded-[8px]" />
+        <div className="flex flex-1 flex-col justify-between py-[4px]">
+          <div className="flex flex-col gap-[8px]">
+            <Skeleton className="h-[22px] w-3/4" />
+            <Skeleton className="h-[16px] w-1/2" />
+          </div>
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-[16px] w-[80px]" />
+            <Skeleton className="h-[16px] w-[64px]" />
+          </div>
+        </div>
+      </div>
+      <div className="mt-[24px] h-px bg-[var(--color-neutral-200)]" />
+    </div>
+  );
+}
+
 export function ReviewCardSkeleton() {
   return (
     <div className="rounded-[12px] border border-solid border-[var(--color-neutral-200)] bg-white p-[24px]">
