@@ -1,11 +1,12 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useLocation } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '@/store';
 import { setUser } from '@/store/authSlice';
 import { getProfile, updateProfile } from '@/api/me';
-import { Camera } from 'lucide-react';
 import { toast } from 'sonner';
+import ProfileForm from '@/components/ProfileForm';
+import LoanStatsCard from '@/components/LoanStatsCard';
 
 const TABS = [
   { label: 'Profile', path: '/my-profile' },
@@ -13,12 +14,18 @@ const TABS = [
   { label: 'Reviews', path: '/my-reviews' },
 ];
 
+const STATS = [
+  { key: 'total', label: 'Total Loans', color: 'var(--color-primary-300)' },
+  { key: 'active', label: 'Active', color: 'var(--color-primary-300)' },
+  { key: 'returned', label: 'Returned', color: 'var(--color-accent-green)' },
+  { key: 'overdue', label: 'Overdue', color: 'var(--color-accent-red)' },
+] as const;
+
 export default function MyProfile() {
   const location = useLocation();
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
   const { user } = useAppSelector((state) => state.auth);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user?.name || '');
@@ -50,13 +57,6 @@ export default function MyProfile() {
     onError: () => toast.error('Failed to update profile'),
   });
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setPhotoFile(file);
-    setPhotoPreview(URL.createObjectURL(file));
-  };
-
   const handleEdit = () => {
     setName(user?.name || '');
     setPhone(user?.phone || '');
@@ -69,18 +69,30 @@ export default function MyProfile() {
     setPhotoPreview(null);
   };
 
-  if (isLoading) return (
-    <div className="flex items-center justify-center py-[64px]">
-      <p className="text-md font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>Loading...</p>
-    </div>
-  );
+  const handlePhotoChange = (file: File) => {
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-[64px]">
+        <p className="text-md font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>
+          Loading...
+        </p>
+      </div>
+    );
+  }
 
   const avatarSrc = photoPreview || user?.profilePhoto;
 
   return (
     <div className="flex w-full flex-col gap-[32px]">
       {/* Tab Navigation */}
-      <div className="flex h-[56px] items-center gap-[8px] rounded-[16px] p-[8px]" style={{ backgroundColor: 'var(--color-neutral-100)', width: 'fit-content' }}>
+      <div
+        className="flex h-[56px] items-center gap-[8px] rounded-[16px] p-[8px]"
+        style={{ backgroundColor: 'var(--color-neutral-100)', width: 'fit-content' }}
+      >
         {TABS.map((tab) => {
           const isActive = location.pathname === tab.path;
           return (
@@ -105,123 +117,40 @@ export default function MyProfile() {
         })}
       </div>
 
-      {/* Profile Title */}
-      <p className="text-display-sm font-bold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}>
+      {/* Title */}
+      <p
+        className="text-display-sm font-bold"
+        style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}
+      >
         Profile
       </p>
 
       {/* Profile Card */}
-      <div className="flex w-full max-w-[557px] flex-col gap-[24px] rounded-[16px] bg-white p-[20px]" style={{ boxShadow: '0px 0px 20px 0px rgba(203,202,202,0.25)' }}>
-        <div className="flex flex-col gap-[12px]">
-          {/* Avatar */}
-          <div className="relative h-[64px] w-[64px]">
-            {avatarSrc ? (
-              <img src={avatarSrc} alt="avatar" className="h-[64px] w-[64px] rounded-full object-cover" />
-            ) : (
-              <div className="flex h-[64px] w-[64px] items-center justify-center rounded-full" style={{ background: 'linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-700))' }}>
-                <span className="text-xl font-bold text-white" style={{ fontFamily: 'var(--font-family-quicksand)' }}>
-                  {user?.name?.charAt(0).toUpperCase()}
-                </span>
-              </div>
-            )}
-            {isEditing && (
-              <>
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40"
-                >
-                  <Camera className="h-5 w-5 text-white" />
-                </button>
-                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
-              </>
-            )}
-          </div>
-
-          {/* Info Rows */}
-          {isEditing ? (
-            <>
-              <div className="flex w-full flex-col gap-[4px]">
-                <label className="text-md font-medium" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)', letterSpacing: '-0.48px' }}>Name</label>
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="h-[44px] w-full rounded-[12px] border border-solid border-[var(--color-neutral-300)] px-[16px] outline-none text-md font-bold"
-                  style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}
-                />
-              </div>
-              <div className="flex w-full items-center justify-between">
-                <p className="text-md font-medium" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)', letterSpacing: '-0.48px' }}>Email</p>
-                <p className="text-md font-bold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-600)', letterSpacing: '-0.32px' }}>{user?.email}</p>
-              </div>
-              <div className="flex w-full flex-col gap-[4px]">
-                <label className="text-md font-medium" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)', letterSpacing: '-0.48px' }}>Nomor Handphone</label>
-                <input
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="h-[44px] w-full rounded-[12px] border border-solid border-[var(--color-neutral-300)] px-[16px] outline-none text-md font-bold"
-                  style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              {[
-                { label: 'Name', value: user?.name },
-                { label: 'Email', value: user?.email },
-                { label: 'Nomor Handphone', value: user?.phone || '-' },
-              ].map(({ label, value }) => (
-                <div key={label} className="flex w-full items-center justify-between">
-                  <p className="text-md font-medium" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)', letterSpacing: '-0.48px' }}>{label}</p>
-                  <p className="text-md font-bold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)', letterSpacing: '-0.32px' }}>{value}</p>
-                </div>
-              ))}
-            </>
-          )}
-        </div>
-
-        {/* Action Buttons */}
-        {isEditing ? (
-          <div className="flex gap-[12px]">
-            <button
-              onClick={handleCancel}
-              className="flex h-[44px] flex-1 items-center justify-center rounded-[100px] border border-solid border-[var(--color-neutral-300)] font-bold"
-              style={{ fontFamily: 'var(--font-family-quicksand)', fontSize: 'var(--font-size-text-md)', color: 'var(--color-neutral-950)' }}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={() => updateMutation.mutate()}
-              disabled={updateMutation.isPending}
-              className="flex h-[44px] flex-1 items-center justify-center rounded-[100px] font-bold disabled:opacity-50"
-              style={{ backgroundColor: 'var(--color-primary-300)', color: 'var(--color-neutral-25)', fontFamily: 'var(--font-family-quicksand)', fontSize: 'var(--font-size-text-md)' }}
-            >
-              {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={handleEdit}
-            className="flex h-[44px] w-full items-center justify-center rounded-[100px] font-bold"
-            style={{ backgroundColor: 'var(--color-primary-300)', color: 'var(--color-neutral-25)', fontFamily: 'var(--font-family-quicksand)', fontSize: 'var(--font-size-text-md)', letterSpacing: '-0.32px' }}
-          >
-            Update Profile
-          </button>
-        )}
-      </div>
+      <ProfileForm
+        isEditing={isEditing}
+        name={name}
+        phone={phone}
+        email={user?.email || ''}
+        avatarSrc={avatarSrc}
+        isSaving={updateMutation.isPending}
+        onNameChange={setName}
+        onPhoneChange={setPhone}
+        onPhotoChange={handlePhotoChange}
+        onEdit={handleEdit}
+        onSave={() => updateMutation.mutate()}
+        onCancel={handleCancel}
+      />
 
       {/* Loan Statistics */}
       {profile && (
         <div className="grid grid-cols-2 gap-[16px] md:grid-cols-4" style={{ maxWidth: '557px' }}>
-          {[
-            { label: 'Total Loans', value: profile.loanStats.total, color: 'var(--color-primary-300)' },
-            { label: 'Active', value: profile.loanStats.active, color: 'var(--color-primary-300)' },
-            { label: 'Returned', value: profile.loanStats.returned, color: 'var(--color-accent-green)' },
-            { label: 'Overdue', value: profile.loanStats.overdue, color: 'var(--color-accent-red)' },
-          ].map(({ label, value, color }) => (
-            <div key={label} className="flex flex-col gap-[4px] rounded-[12px] border border-solid border-[var(--color-neutral-200)] bg-white p-[16px]">
-              <p className="text-display-xs font-bold" style={{ fontFamily: 'var(--font-family-quicksand)', color }}>{value}</p>
-              <p className="text-sm font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-600)' }}>{label}</p>
-            </div>
+          {STATS.map(({ key, label, color }) => (
+            <LoanStatsCard
+              key={key}
+              label={label}
+              value={profile.loanStats[key]}
+              color={color}
+            />
           ))}
         </div>
       )}
