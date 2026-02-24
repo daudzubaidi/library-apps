@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useLocation } from 'react-router-dom';
 import { getMyReviews } from '@/api/me';
@@ -85,7 +86,7 @@ export default function MyReviews() {
                     ))}
                   </div>
                   <p className="text-xs font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>
-                    {new Date(review.createdAt).toLocaleDateString()}
+                    {dayjs(review.createdAt).format('MMM D, YYYY')}
                   </p>
                 </div>
               </div>
