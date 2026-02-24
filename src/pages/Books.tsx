@@ -193,40 +193,42 @@ export default function Books() {
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
                 className="flex h-[40px] w-[40px] items-center justify-center rounded-[8px] border border-solid border-[var(--color-neutral-300)] bg-white font-bold transition-colors hover:bg-[var(--color-neutral-50)] disabled:opacity-50"
-                style={{
-                  fontFamily: 'var(--font-family-quicksand)',
-                  fontSize: 'var(--font-size-text-sm)',
-                  color: 'var(--color-neutral-950)',
-                }}
+                style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}
               >
                 ←
               </button>
-              {Array.from({ length: booksData.meta.totalPages }, (_, i) => i + 1).map((pageNum) => (
-                <button
-                  key={pageNum}
-                  onClick={() => setPage(pageNum)}
-                  className={`flex h-[40px] w-[40px] items-center justify-center rounded-[8px] font-bold transition-colors ${
-                    page === pageNum
-                      ? 'bg-[var(--color-primary-300)] text-white'
-                      : 'border border-solid border-[var(--color-neutral-300)] bg-white text-[var(--color-neutral-950)] hover:bg-[var(--color-neutral-50)]'
-                  }`}
-                  style={{
-                    fontFamily: 'var(--font-family-quicksand)',
-                    fontSize: 'var(--font-size-text-sm)',
-                  }}
-                >
-                  {pageNum}
-                </button>
-              ))}
+              {(() => {
+                const total = booksData.meta.totalPages;
+                const delta = 2;
+                const pages: (number | '...')[] = [];
+                const left = Math.max(2, page - delta);
+                const right = Math.min(total - 1, page + delta);
+                pages.push(1);
+                if (left > 2) pages.push('...');
+                for (let i = left; i <= right; i++) pages.push(i);
+                if (right < total - 1) pages.push('...');
+                if (total > 1) pages.push(total);
+                return pages.map((p, idx) =>
+                  p === '...' ? (
+                    <span key={`ellipsis-${idx}`} className="flex h-[40px] w-[40px] items-center justify-center text-sm font-semibold"
+                      style={{ color: 'var(--color-neutral-500)' }}>…</span>
+                  ) : (
+                    <button key={p} onClick={() => setPage(p as number)}
+                      className={`flex h-[40px] w-[40px] items-center justify-center rounded-[8px] font-bold transition-colors ${
+                        page === p ? 'bg-[var(--color-primary-300)] text-white' : 'border border-solid border-[var(--color-neutral-300)] bg-white text-[var(--color-neutral-950)] hover:bg-[var(--color-neutral-50)]'
+                      }`}
+                      style={{ fontFamily: 'var(--font-family-quicksand)', fontSize: 'var(--font-size-text-sm)' }}
+                    >
+                      {p}
+                    </button>
+                  )
+                );
+              })()}
               <button
                 onClick={() => setPage((p) => Math.min(booksData.meta.totalPages, p + 1))}
                 disabled={page === booksData.meta.totalPages}
                 className="flex h-[40px] w-[40px] items-center justify-center rounded-[8px] border border-solid border-[var(--color-neutral-300)] bg-white font-bold transition-colors hover:bg-[var(--color-neutral-50)] disabled:opacity-50"
-                style={{
-                  fontFamily: 'var(--font-family-quicksand)',
-                  fontSize: 'var(--font-size-text-sm)',
-                  color: 'var(--color-neutral-950)',
-                }}
+                style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}
               >
                 →
               </button>

@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { useQuery } from '@tanstack/react-query';
 import type { RootState } from '@/store';
 import { logout } from '@/store/authSlice';
+import { setCartCount } from '@/store/cartSlice';
+import { getCart } from '@/api/cart';
 import { ShoppingCart, User, LogOut, LayoutDashboard, Menu, X, BookOpen, ClipboardList } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -27,6 +30,19 @@ export default function MainLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Sync cart count badge from server on layout mount and after cart changes
+  const { data: cart } = useQuery({
+    queryKey: ['cart'],
+    queryFn: getCart,
+    staleTime: 30 * 1000,
+  });
+
+  useEffect(() => {
+    if (cart) {
+      dispatch(setCartCount(cart.items.length));
+    }
+  }, [cart, dispatch]);
 
   const handleLogout = () => {
     dispatch(logout());

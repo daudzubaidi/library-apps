@@ -69,13 +69,13 @@ export default function LoanCard({ loan, onReturn, isReturning }: LoanCardProps)
               {Math.abs(daysRemaining)} days overdue
             </p>
           )}
-          {loan.status === 'BORROWED' && (
+          {(loan.status === 'BORROWED' || loan.status === 'LATE') && (
             <button
               onClick={() => onReturn(loan.id)}
               disabled={isReturning}
               className="ml-auto flex h-[40px] items-center justify-center rounded-[100px] px-[24px] font-bold transition-opacity hover:opacity-90 disabled:opacity-50"
               style={{
-                backgroundColor: 'var(--color-primary-300)',
+                backgroundColor: loan.status === 'LATE' ? 'var(--color-accent-red)' : 'var(--color-primary-300)',
                 color: 'var(--color-neutral-25)',
                 fontFamily: 'var(--font-family-quicksand)',
               }}
