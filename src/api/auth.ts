@@ -8,4 +8,4 @@ export const register = (data: RegisterPayload) =>
   client.post<{ token: string; user: User }>('/api/auth/register', data).then((res) => res.data);
 
 export const getProfile = () =>
-  client.get<User>('/api/auth/profile').then((res) => res.data);
+  client.get<User>('/api/me').then((res) => res.data);
