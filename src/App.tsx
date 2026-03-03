@@ -1,8 +1,6 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ProtectedRoute, AdminRoute } from '@/components/ProtectedRoute';
-import { useProfile } from '@/hooks/useAuth';
-import { useAppSelector } from '@/store';
 import MainLayout from '@/layouts/MainLayout';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
@@ -66,10 +64,5 @@ function AnimatedOutlet() {
 }
 
 export default function App() {
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
-
-  // Only fetch profile when authenticated
-  useProfile(isAuthenticated);
-
   return <AnimatedOutlet />;
 }
