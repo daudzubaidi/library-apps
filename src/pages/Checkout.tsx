@@ -36,12 +36,10 @@ export default function Checkout() {
     mutationFn: () =>
       checkoutFromCart({ itemIds: selectedItems, days: duration }),
     onSuccess: () => {
-      toast.success('Books borrowed successfully!');
-      // Clear cart count badge
       dispatch(setCartCount(0));
       queryClient.invalidateQueries({ queryKey: ['cart'] });
       queryClient.invalidateQueries({ queryKey: ['myLoans'] });
-      navigate('/my-loans');
+      navigate('/success', { state: { duration } });
     },
     onError: () => toast.error('Failed to borrow books. Please try again.'),
   });

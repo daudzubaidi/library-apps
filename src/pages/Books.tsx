@@ -1,241 +1,227 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from '@/store';
-import { setSearchQuery, setSelectedCategoryId } from '@/store/uiSlice';
-import { getBooks } from '@/api/books';
+import { useQuery } from '@tanstack/react-query';
+import { Star, BookOpen, ChevronRight } from 'lucide-react';
+import { getRecommendedBooks } from '@/api/books';
 import { getCategories } from '@/api/categories';
-import { Search, AlertCircle } from 'lucide-react';
+import { getPopularAuthors } from '@/api/authors';
+import Footer from '@/components/Footer';
 import { BookCardSkeleton } from '@/components/Skeleton';
 
+// Category → emoji icon mapping
+const CATEGORY_ICONS: Record<string, string> = {
+  fiction: '🪄',
+  'non-fiction': '📰',
+  nonfiction: '📰',
+  'self-improve': '🌱',
+  'self-improvement': '🌱',
+  self: '🌱',
+  finance: '💰',
+  science: '🔬',
+  technology: '🔬',
+  education: '📚',
+  history: '🏛️',
+  biography: '👤',
+  mystery: '🔍',
+  romance: '❤️',
+  fantasy: '⚔️',
+  default: '📖',
+};
+
+function getCategoryIcon(name: string): string {
+  const lower = name.toLowerCase();
+  for (const [key, icon] of Object.entries(CATEGORY_ICONS)) {
+    if (lower.includes(key)) return icon;
+  }
+  return CATEGORY_ICONS.default;
+}
+
+// Carousel dots
+function CarouselDots({ total, active }: { total: number; active: number }) {
+  return (
+    <div className="flex items-center gap-[8px]">
+      {Array.from({ length: total }).map((_, i) => (
+        <div
+          key={i}
+          className="rounded-full transition-all"
+          style={{
+            width: i === active ? '20px' : '8px',
+            height: '8px',
+            backgroundColor: i === active ? 'white' : 'rgba(255,255,255,0.5)',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function Books() {
-  const dispatch = useAppDispatch();
-  const { searchQuery, selectedCategoryId } = useAppSelector((state) => state.ui);
-  const [page, setPage] = useState(1);
+  const [shownCount, setShownCount] = useState(10);
+
+  const { data: recommendations, isLoading: loadingRec } = useQuery({
+    queryKey: ['recommendations'],
+    queryFn: () => getRecommendedBooks({ limit: 20 }),
+  });
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
     queryFn: getCategories,
   });
 
-  const { data: booksData, isLoading, isError, refetch } = useQuery({
-    queryKey: ['books', { q: searchQuery, categoryId: selectedCategoryId, page }],
-    queryFn: () => getBooks({ q: searchQuery, categoryId: selectedCategoryId || undefined, page, limit: 12 }),
+  const { data: popularAuthors } = useQuery({
+    queryKey: ['popularAuthors'],
+    queryFn: () => getPopularAuthors(4),
   });
 
+  const visibleBooks = (recommendations?.data ?? []).slice(0, shownCount);
+  const hasMore = (recommendations?.data?.length ?? 0) > shownCount;
+
   return (
-    <div className="flex w-full flex-col gap-[32px]">
-      {/* Search Bar */}
-      <div className="flex w-full items-center gap-[12px] rounded-[12px] border border-solid border-[var(--color-neutral-300)] bg-white px-[16px] py-[12px]">
-        <Search className="h-[20px] w-[20px] text-[var(--color-neutral-500)]" />
-        <input
-          type="text"
-          placeholder="Search books..."
-          value={searchQuery}
-          onChange={(e) => dispatch(setSearchQuery(e.target.value))}
-          className="flex-1 border-none bg-transparent outline-none text-sm font-semibold"
-          style={{
-            fontFamily: 'var(--font-family-quicksand)',
-            fontSize: 'var(--font-size-text-sm)',
-            lineHeight: 'var(--line-height-text-sm)',
-            color: 'var(--color-neutral-950)',
-            letterSpacing: '-0.28px',
-          }}
-        />
+    <div className="flex w-full flex-col">
+      {/* ── Welcome Banner ── */}
+      <div
+        className="relative mb-[32px] overflow-hidden rounded-[16px]"
+        style={{
+          background: 'linear-gradient(135deg, #4B6CF8 0%, #6B9BF8 60%, #93C5FD 100%)',
+          minHeight: '160px',
+        }}
+      >
+        {/* Decorative circles */}
+        <div className="absolute -right-8 -top-8 h-[200px] w-[200px] rounded-full opacity-10" style={{ background: 'white' }} />
+        <div className="absolute -bottom-12 right-20 h-[160px] w-[160px] rounded-full opacity-10" style={{ background: 'white' }} />
+
+        <div className="relative flex h-full min-h-[160px] flex-col items-center justify-center gap-[12px] px-[24px] py-[32px]">
+          <h1
+            className="text-center text-display-lg font-bold text-white drop-shadow-sm"
+            style={{ fontFamily: 'var(--font-family-quicksand)', textShadow: '0 2px 8px rgba(0,0,0,0.15)' }}
+          >
+            Welcome to Booky
+          </h1>
+          <CarouselDots total={3} active={0} />
+        </div>
       </div>
 
-      {/* Category Filter */}
-      <div className="flex flex-wrap items-center gap-[12px]">
-        <button
-          onClick={() => dispatch(setSelectedCategoryId(null))}
-          className={`flex items-center justify-center rounded-[100px] px-[16px] py-[8px] transition-colors ${
-            selectedCategoryId === null
-              ? 'bg-[var(--color-primary-300)] text-white'
-              : 'border border-solid border-[var(--color-neutral-300)] bg-white text-[var(--color-neutral-950)]'
-          }`}
-          style={{
-            fontFamily: 'var(--font-family-quicksand)',
-            fontSize: 'var(--font-size-text-sm)',
-            lineHeight: 'var(--line-height-text-sm)',
-            fontWeight: 'var(--font-weight-bold)',
-            letterSpacing: '-0.28px',
-          }}
-        >
-          All
-        </button>
-        {categories?.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => dispatch(setSelectedCategoryId(cat.id))}
-            className={`flex items-center justify-center rounded-[100px] px-[16px] py-[8px] transition-colors ${
-              selectedCategoryId === cat.id
-                ? 'bg-[var(--color-primary-300)] text-white'
-                : 'border border-solid border-[var(--color-neutral-300)] bg-white text-[var(--color-neutral-950)]'
-            }`}
-            style={{
-              fontFamily: 'var(--font-family-quicksand)',
-              fontSize: 'var(--font-size-text-sm)',
-              lineHeight: 'var(--line-height-text-sm)',
-              fontWeight: 'var(--font-weight-bold)',
-              letterSpacing: '-0.28px',
-            }}
-          >
-            {cat.name}
-          </button>
-        ))}
-      </div>
-
-      {/* Books Grid */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 gap-[24px] sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {Array.from({ length: 12 }).map((_, i) => <BookCardSkeleton key={i} />)}
-        </div>
-      ) : isError ? (
-        <div className="flex flex-col items-center justify-center gap-[16px] py-[64px]">
-          <AlertCircle className="h-[48px] w-[48px] text-[var(--color-accent-red)]" />
-          <p className="text-md font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>
-            Failed to load books
-          </p>
-          <button
-            onClick={() => refetch()}
-            className="flex h-[40px] items-center justify-center rounded-[100px] px-[24px] text-sm font-bold"
-            style={{ backgroundColor: 'var(--color-primary-300)', color: 'var(--color-neutral-25)', fontFamily: 'var(--font-family-quicksand)' }}
-          >
-            Try again
-          </button>
-        </div>
-      ) : booksData?.data.length === 0 ? (
-        <div className="flex items-center justify-center py-[64px]">
-          <div className="text-md font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>
-            No books found
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 gap-[24px] sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {booksData?.data.map((book) => (
-              <Link
-                key={book.id}
-                to={`/books/${book.id}`}
-                className="flex w-full flex-col gap-[12px] overflow-hidden rounded-[12px] border border-solid border-[var(--color-neutral-200)] bg-white p-[16px] transition-shadow hover:shadow-lg"
+      {/* ── Category Icons ── */}
+      {categories && categories.length > 0 && (
+        <div className="mb-[40px] flex flex-wrap justify-center gap-[16px]">
+          {categories.map((cat) => (
+            <Link
+              key={cat.id}
+              to={`/categories/${cat.id}`}
+              className="flex flex-col items-center gap-[8px] transition-transform hover:scale-105"
+            >
+              <div
+                className="flex h-[56px] w-[56px] items-center justify-center rounded-[12px] text-2xl"
+                style={{ backgroundColor: 'var(--color-primary-50, #EEF2FF)' }}
               >
-                {/* Book Cover */}
-                <div className="relative h-[240px] w-full overflow-hidden rounded-[8px] bg-[var(--color-neutral-100)]">
-                  {book.coverImage ? (
-                    <img src={book.coverImage} alt={book.title} className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-[var(--color-neutral-400)]">
-                      No Image
-                    </div>
-                  )}
-                </div>
+                {getCategoryIcon(cat.name)}
+              </div>
+              <span
+                className="max-w-[72px] text-center text-xs font-semibold"
+                style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-700)' }}
+              >
+                {cat.name}
+              </span>
+            </Link>
+          ))}
+        </div>
+      )}
 
-                {/* Book Info */}
-                <div className="flex flex-col gap-[4px]">
-                  <h3
-                    className="line-clamp-2 font-bold"
-                    style={{
-                      fontFamily: 'var(--font-family-quicksand)',
-                      fontSize: 'var(--font-size-text-md)',
-                      lineHeight: 'var(--line-height-text-md)',
-                      color: 'var(--color-neutral-950)',
-                      letterSpacing: '-0.32px',
-                    }}
-                  >
-                    {book.title}
-                  </h3>
-                  <p
-                    className="font-semibold"
-                    style={{
-                      fontFamily: 'var(--font-family-quicksand)',
-                      fontSize: 'var(--font-size-text-sm)',
-                      lineHeight: 'var(--line-height-text-sm)',
-                      color: 'var(--color-neutral-600)',
-                      letterSpacing: '-0.28px',
-                    }}
-                  >
-                    {book.author.name}
-                  </p>
-                  <div className="flex items-center justify-between mt-[4px]">
-                    <span
-                      className="font-bold"
-                      style={{
-                        fontFamily: 'var(--font-family-quicksand)',
-                        fontSize: 'var(--font-size-text-sm)',
-                        lineHeight: 'var(--line-height-text-sm)',
-                        color: 'var(--color-primary-300)',
-                        letterSpacing: '-0.28px',
-                      }}
-                    >
-                      ⭐ {book.averageRating.toFixed(1)}
-                    </span>
-                    <span
-                      className="font-semibold"
-                      style={{
-                        fontFamily: 'var(--font-family-quicksand)',
-                        fontSize: 'var(--font-size-text-xs)',
-                        lineHeight: 'var(--line-height-text-xs)',
-                        color: book.availableStock > 0 ? 'var(--color-accent-green)' : 'var(--color-accent-red)',
-                      }}
-                    >
-                      {book.availableStock > 0 ? `${book.availableStock} available` : 'Out of stock'}
-                    </span>
+      {/* ── Recommendation ── */}
+      <section className="mb-[48px]">
+        <h2
+          className="mb-[24px] text-display-sm font-bold"
+          style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}
+        >
+          Recommendation
+        </h2>
+
+        {loadingRec ? (
+          <div className="grid grid-cols-2 gap-[16px] sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {Array.from({ length: 10 }).map((_, i) => <BookCardSkeleton key={i} />)}
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-[16px] sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              {visibleBooks.map((book) => (
+                <Link key={book.id} to={`/books/${book.id}`} className="group flex flex-col gap-[10px] overflow-hidden rounded-[12px] bg-white transition-shadow hover:shadow-md" style={{ border: '1px solid var(--color-neutral-200)' }}>
+                  <div className="aspect-[2/3] w-full overflow-hidden bg-[var(--color-neutral-100)]">
+                    {book.coverImage
+                      ? <img src={book.coverImage} alt={book.title} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                      : <div className="flex h-full w-full items-center justify-center"><BookOpen className="h-12 w-12 text-[var(--color-neutral-300)]" /></div>
+                    }
+                  </div>
+                  <div className="flex flex-col gap-[4px] px-[12px] pb-[12px]">
+                    <p className="line-clamp-2 text-sm font-bold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}>{book.title}</p>
+                    <p className="line-clamp-1 text-xs font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-600)' }}>{book.author.name}</p>
+                    <div className="flex items-center gap-[4px]">
+                      <Star className="h-[12px] w-[12px] fill-[var(--color-accent-yellow)] text-[var(--color-accent-yellow)]" />
+                      <span className="text-xs font-bold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}>{book.averageRating.toFixed(1)}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {hasMore && (
+              <div className="mt-[32px] flex justify-center">
+                <button
+                  onClick={() => setShownCount((c) => c + 10)}
+                  className="flex h-[44px] items-center gap-[8px] rounded-[100px] border border-solid border-[var(--color-neutral-300)] bg-white px-[32px] font-bold transition-colors hover:bg-[var(--color-neutral-50)]"
+                  style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}
+                >
+                  Load More
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </section>
+
+      {/* ── Popular Authors ── */}
+      {popularAuthors && popularAuthors.length > 0 && (
+        <section className="mb-[48px]">
+          <h2
+            className="mb-[24px] text-display-sm font-bold"
+            style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}
+          >
+            Popular Authors
+          </h2>
+          <div className="flex flex-wrap gap-[20px]">
+            {popularAuthors.map((author) => (
+              <Link
+                key={author.id}
+                to={`/authors/${author.id}`}
+                className="flex items-center gap-[12px] rounded-[12px] border border-solid border-[var(--color-neutral-200)] bg-white px-[16px] py-[12px] transition-shadow hover:shadow-sm"
+              >
+                {/* Avatar */}
+                <div className="h-[48px] w-[48px] shrink-0 overflow-hidden rounded-full">
+                  {author.photoUrl
+                    ? <img src={author.photoUrl} alt={author.name} className="h-full w-full object-cover" />
+                    : (
+                      <div className="flex h-full w-full items-center justify-center rounded-full" style={{ background: 'linear-gradient(135deg, var(--color-primary-300), #6B9BF8)' }}>
+                        <span className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-family-quicksand)' }}>
+                          {author.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )
+                  }
+                </div>
+                <div>
+                  <p className="font-bold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}>{author.name}</p>
+                  <div className="flex items-center gap-[4px]">
+                    <BookOpen className="h-[12px] w-[12px]" style={{ color: 'var(--color-neutral-500)' }} />
+                    <span className="text-xs font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>5 books</span>
                   </div>
                 </div>
+                <ChevronRight className="ml-[8px] h-[16px] w-[16px]" style={{ color: 'var(--color-neutral-400)' }} />
               </Link>
             ))}
           </div>
-
-          {/* Pagination */}
-          {booksData && booksData.meta.totalPages > 1 && (
-            <div className="flex items-center justify-center gap-[8px]">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="flex h-[40px] w-[40px] items-center justify-center rounded-[8px] border border-solid border-[var(--color-neutral-300)] bg-white font-bold transition-colors hover:bg-[var(--color-neutral-50)] disabled:opacity-50"
-                style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}
-              >
-                ←
-              </button>
-              {(() => {
-                const total = booksData.meta.totalPages;
-                const delta = 2;
-                const pages: (number | '...')[] = [];
-                const left = Math.max(2, page - delta);
-                const right = Math.min(total - 1, page + delta);
-                pages.push(1);
-                if (left > 2) pages.push('...');
-                for (let i = left; i <= right; i++) pages.push(i);
-                if (right < total - 1) pages.push('...');
-                if (total > 1) pages.push(total);
-                return pages.map((p, idx) =>
-                  p === '...' ? (
-                    <span key={`ellipsis-${idx}`} className="flex h-[40px] w-[40px] items-center justify-center text-sm font-semibold"
-                      style={{ color: 'var(--color-neutral-500)' }}>…</span>
-                  ) : (
-                    <button key={p} onClick={() => setPage(p as number)}
-                      className={`flex h-[40px] w-[40px] items-center justify-center rounded-[8px] font-bold transition-colors ${
-                        page === p ? 'bg-[var(--color-primary-300)] text-white' : 'border border-solid border-[var(--color-neutral-300)] bg-white text-[var(--color-neutral-950)] hover:bg-[var(--color-neutral-50)]'
-                      }`}
-                      style={{ fontFamily: 'var(--font-family-quicksand)', fontSize: 'var(--font-size-text-sm)' }}
-                    >
-                      {p}
-                    </button>
-                  )
-                );
-              })()}
-              <button
-                onClick={() => setPage((p) => Math.min(booksData.meta.totalPages, p + 1))}
-                disabled={page === booksData.meta.totalPages}
-                className="flex h-[40px] w-[40px] items-center justify-center rounded-[8px] border border-solid border-[var(--color-neutral-300)] bg-white font-bold transition-colors hover:bg-[var(--color-neutral-50)] disabled:opacity-50"
-                style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}
-              >
-                →
-              </button>
-            </div>
-          )}
-        </>
+        </section>
       )}
+
+      <Footer />
     </div>
   );
 }

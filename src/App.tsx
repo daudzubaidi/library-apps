@@ -9,6 +9,9 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import Books from '@/pages/Books';
 import BookDetail from '@/pages/BookDetail';
+import CategoryBooks from '@/pages/CategoryBooks';
+import AuthorBooks from '@/pages/AuthorBooks';
+import Success from '@/pages/Success';
 import MyLoans from '@/pages/MyLoans';
 import MyProfile from '@/pages/MyProfile';
 import MyReviews from '@/pages/MyReviews';
@@ -37,6 +40,9 @@ function AnimatedOutlet() {
             <Route element={<MainLayout />}>
               <Route path="/books" element={<Books />} />
               <Route path="/books/:id" element={<BookDetail />} />
+              <Route path="/categories/:id" element={<CategoryBooks />} />
+              <Route path="/authors/:id" element={<AuthorBooks />} />
+              <Route path="/success" element={<Success />} />
               <Route path="/my-loans" element={<MyLoans />} />
               <Route path="/my-profile" element={<MyProfile />} />
               <Route path="/my-reviews" element={<MyReviews />} />
