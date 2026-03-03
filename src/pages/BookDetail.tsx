@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
 import { getBook } from '@/api/books';
 import { getBookReviews, createReview } from '@/api/reviews';
 import { addToCart } from '@/api/cart';
@@ -50,7 +51,10 @@ export default function BookDetail() {
       queryClient.invalidateQueries({ queryKey: ['reviews', id] });
       queryClient.invalidateQueries({ queryKey: ['book', id] });
     },
-    onError: () => toast.error('Failed to submit review'),
+    onError: (err: unknown) => {
+      const msg = isAxiosError(err) ? err.response?.data?.message : undefined;
+      toast.error(msg || 'Failed to submit review');
+    },
   });
 
   if (isLoading) return <BookDetailSkeleton />;

@@ -36,12 +36,14 @@ export default function LoanCard({ loan, onReturn, isReturning }: LoanCardProps)
               {loan.book.title}
             </h3>
           </Link>
-          <p
-            className="mb-[12px] text-sm font-semibold"
-            style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-600)' }}
-          >
-            {loan.book.author.name}
-          </p>
+          {loan.book.author?.name && (
+            <p
+              className="mb-[12px] text-sm font-semibold"
+              style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-600)' }}
+            >
+              {loan.book.author.name}
+            </p>
+          )}
 
           <div className="flex gap-[24px]">
             <DateInfo label="Borrow Date" value={dayjs(loan.borrowDate).format('MMM D, YYYY')} />

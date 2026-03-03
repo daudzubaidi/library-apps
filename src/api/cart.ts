@@ -2,7 +2,14 @@ import client from './client';
 import type { Cart } from '@/types';
 
 export const getCart = () =>
-  client.get<Cart>('/api/cart').then((res) => res.data);
+  client.get('/api/cart').then((res) => {
+    const d = res.data as Record<string, unknown>;
+    return {
+      id: (d?.cartId as number) ?? 0,
+      userId: (d?.userId as number) ?? 0,
+      items: (d?.items ?? []) as Cart['items'],
+    } as Cart;
+  });
 
 export const addToCart = (bookId: number) =>
   client.post('/api/cart/items', { bookId }).then((res) => res.data);

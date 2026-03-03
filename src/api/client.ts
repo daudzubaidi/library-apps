@@ -17,7 +17,13 @@ client.interceptors.request.use((config) => {
 });
 
 client.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Unwrap API envelope: { success, message, data } → data
+    if (response.data && typeof response.data === 'object' && 'data' in response.data) {
+      response.data = response.data.data;
+    }
+    return response;
+  },
   (error) => {
     if (error.response?.status === 401) {
       store.dispatch(logout());
