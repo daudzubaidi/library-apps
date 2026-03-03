@@ -73,8 +73,9 @@ export default function Books() {
     queryFn: () => getPopularAuthors(4),
   });
 
-  const visibleBooks = (recommendations?.data ?? []).slice(0, shownCount);
-  const hasMore = (recommendations?.data?.length ?? 0) > shownCount;
+  const booksList = recommendations?.data ?? [];
+  const visibleBooks = booksList.slice(0, shownCount);
+  const hasMore = booksList.length > shownCount;
 
   // Show error state if any query fails
   if (recError || catError || authError) {

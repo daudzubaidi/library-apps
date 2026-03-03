@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__figma__get_metadata",
+      "mcp__figma__get_design_context",
+      "WebFetch(domain:www.figma.com)",
+      "Bash(npm run build)",
+      "Bash(git add src/components/LoanCard.tsx src/layouts/MainLayout.tsx src/pages/Books.tsx)",
+      "Bash(git commit -m \"fix: LATE loan return button, cart count sync, windowed pagination\")",
+      "Bash(curl -s http://127.0.0.1:3845/health)",
+      "Bash(curl -sv http://127.0.0.1:3845/)",
+      "Bash(curl -s http://127.0.0.1:3845/mcp)",
+      "mcp__figma__get_screenshot",
+      "Bash(python3 -c \":*)",
+      "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch -f --msg-filter 'sed \"\"/^Co-Authored-By:/d\"\"' HEAD~3..HEAD)",
+      "Bash(git update-index --assume-unchanged .claude/settings.local.json)",
+      "Bash(git reset HEAD~1 --soft)",
+      "Bash(git restore --staged .claude/settings.local.json)",
+      "Bash(git commit -C ORIG_HEAD)",
+      "Bash(git add .gitignore)",
+      "Bash(git commit -m \"chore: add .claude/settings.local.json to .gitignore\")",
+      "Bash(git stash drop stash@{0})",
+      "Bash(git reset --hard HEAD~1)",
+      "WebFetch(domain:library-backend-production-b9cf.up.railway.app)",
+      "Bash(git add src/api/auth.ts)",
+      "Bash(git commit -m \"fix: correct profile endpoint from /api/auth/profile to /api/me\")",
+      "Bash(git add -A)",
+      "Bash(git commit -m \"fix: prevent infinite loop by disabling profile query when not authenticated\")",
+      "Bash(git commit -m \"fix: remove automatic profile fetch to prevent 401 after login:*)",
+      "Bash(git commit -m \"fix: add token check to all cart queries to prevent 401 errors:*)",
+      "Bash(grep -n \"useQuery\" src/pages/admin/*.tsx)",
+      "Bash(git commit -m \"fix: add token check to all user pages to prevent 401 errors:*)",
+      "Bash(git commit -m \"fix: add error handling and null checks to Books page:*)",
+      "Bash(git commit -m \"fix: correct data structure access in Books page:*)"
+    ]
+  }
+}
