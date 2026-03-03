@@ -209,10 +209,9 @@ export default function Books() {
                 </div>
                 <div>
                   <p className="font-bold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-950)' }}>{author.name}</p>
-                  <div className="flex items-center gap-[4px]">
-                    <BookOpen className="h-[12px] w-[12px]" style={{ color: 'var(--color-neutral-500)' }} />
-                    <span className="text-xs font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>5 books</span>
-                  </div>
+                  {author.bio && (
+                    <p className="line-clamp-1 text-xs font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>{author.bio}</p>
+                  )}
                 </div>
                 <ChevronRight className="ml-[8px] h-[16px] w-[16px]" style={{ color: 'var(--color-neutral-400)' }} />
               </Link>
