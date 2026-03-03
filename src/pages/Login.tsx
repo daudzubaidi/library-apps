@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../store';
-import { setCredentials } from '../store/authSlice';
 import { useLoginMutation } from '../hooks/useAuth';
 import { toast } from 'sonner';
 import Logo from '../components/Logo';
@@ -19,7 +17,6 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const loginMutation = useLoginMutation();
 
@@ -50,13 +47,7 @@ export default function Login() {
     }
 
     try {
-      const result = await loginMutation.mutateAsync({ email, password });
-
-      dispatch(setCredentials({
-        token: result.token,
-        user: result.user
-      }));
-
+      await loginMutation.mutateAsync({ email, password });
       toast.success('Login successful!');
       navigate('/');
     } catch (error: any) {

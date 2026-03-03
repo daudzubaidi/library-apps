@@ -12,8 +12,8 @@ export default function CategoryBooks() {
   const [searchParams] = useSearchParams();
   const urlQuery = searchParams.get('q') ?? '';
 
-  const [selectedCategories, setSelectedCategories] = useState<number[]>(() =>
-    id && id !== 'all' ? [Number(id)] : []
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(() =>
+    id && id !== 'all' ? Number(id) : null
   );
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [page, setPage] = useState(1);
@@ -21,9 +21,9 @@ export default function CategoryBooks() {
   // Reset when category ID in URL changes
   useEffect(() => {
     if (id && id !== 'all') {
-      setSelectedCategories([Number(id)]);
+      setSelectedCategory(Number(id));
     } else {
-      setSelectedCategories([]);
+      setSelectedCategory(null);
     }
     setPage(1);
   }, [id]);
@@ -34,23 +34,16 @@ export default function CategoryBooks() {
   });
 
   const { data: booksData, isLoading } = useQuery({
-    queryKey: ['books', selectedCategories, selectedRating, urlQuery, page],
+    queryKey: ['books', selectedCategory, selectedRating, urlQuery, page],
     queryFn: () =>
       getBooks({
         q: urlQuery || undefined,
-        categoryId: selectedCategories.length === 1 ? selectedCategories[0] : undefined,
+        categoryId: selectedCategory ?? undefined,
         minRating: selectedRating ?? undefined,
         page,
         limit: 8,
       }),
   });
-
-  const toggleCategory = (catId: number) => {
-    setSelectedCategories((prev) =>
-      prev.includes(catId) ? prev.filter((c) => c !== catId) : [...prev, catId]
-    );
-    setPage(1);
-  };
 
   return (
     <div className="flex w-full flex-col">
@@ -72,7 +65,7 @@ export default function CategoryBooks() {
             Filter
           </p>
 
-          {/* Category checkboxes */}
+          {/* Category radio buttons */}
           <div className="mb-[24px]">
             <p
               className="mb-[12px] text-md font-bold"
@@ -80,14 +73,15 @@ export default function CategoryBooks() {
             >
               Category
             </p>
-            <div className="flex flex-col gap-[8px]">
+            <div className="flex flex-col gap-[4px]">
               {categories?.map((cat) => (
-                <label key={cat.id} className="flex cursor-pointer items-center gap-[10px]">
+                <label key={cat.id} className="flex cursor-pointer items-center gap-[10px] rounded-[8px] px-[8px] py-[6px] transition-colors hover:bg-[var(--color-neutral-50)]">
                   <input
-                    type="checkbox"
-                    checked={selectedCategories.includes(cat.id)}
-                    onChange={() => toggleCategory(cat.id)}
-                    className="h-[18px] w-[18px] cursor-pointer rounded"
+                    type="radio"
+                    name="category"
+                    checked={selectedCategory === cat.id}
+                    onChange={() => { setSelectedCategory(cat.id); setPage(1); }}
+                    className="h-[18px] w-[18px] cursor-pointer"
                     style={{ accentColor: 'var(--color-primary-300)' }}
                   />
                   <span
@@ -98,6 +92,15 @@ export default function CategoryBooks() {
                   </span>
                 </label>
               ))}
+              {selectedCategory && (
+                <button
+                  onClick={() => { setSelectedCategory(null); setPage(1); }}
+                  className="mt-[4px] text-left text-xs font-semibold underline"
+                  style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}
+                >
+                  Clear category
+                </button>
+              )}
             </div>
           </div>
 

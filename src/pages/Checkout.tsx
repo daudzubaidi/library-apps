@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from '@/store';
-import { setCartCount } from '@/store/cartSlice';
+import { useAppSelector } from '@/store';
 import { getCart } from '@/api/cart';
 import { checkoutFromCart } from '@/api/loans';
 import { toast } from 'sonner';
@@ -12,7 +11,6 @@ export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAppSelector((state) => state.auth);
-  const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
   const [borrowPurpose, setBorrowPurpose] = useState('');
   const [duration, setDuration] = useState<3 | 5 | 10>(3);
@@ -36,7 +34,6 @@ export default function Checkout() {
     mutationFn: () =>
       checkoutFromCart({ itemIds: selectedItems, days: duration }),
     onSuccess: () => {
-      dispatch(setCartCount(0));
       queryClient.invalidateQueries({ queryKey: ['cart'] });
       queryClient.invalidateQueries({ queryKey: ['myLoans'] });
       navigate('/success', { state: { duration } });

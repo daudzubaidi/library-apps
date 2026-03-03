@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../store';
-import { setCredentials } from '../store/authSlice';
 import { useRegisterMutation } from '../hooks/useAuth';
 import { toast } from 'sonner';
 import Logo from '../components/Logo';
@@ -18,7 +16,6 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState({ password: false, confirm: false });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const registerMutation = useRegisterMutation();
 
@@ -39,8 +36,7 @@ export default function Register() {
     e.preventDefault();
     if (!validate()) return;
     try {
-      const result = await registerMutation.mutateAsync(formData);
-      dispatch(setCredentials({ token: result.token, user: result.user }));
+      await registerMutation.mutateAsync(formData);
       toast.success('Registration successful!');
       navigate('/');
     } catch (error: any) {
