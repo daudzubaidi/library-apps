@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '@/store';
+import { useAppDispatch, useAppSelector } from '@/store';
 import { setCartCount } from '@/store/cartSlice';
 import { getCart, removeFromCart } from '@/api/cart';
 import { Trash2 } from 'lucide-react';
@@ -12,11 +12,13 @@ export default function Cart() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
+  const token = useAppSelector((state) => state.auth.token);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
   const { data: cart, isLoading } = useQuery({
     queryKey: ['cart'],
     queryFn: getCart,
+    enabled: !!token,
   });
 
   // Sync cart count to Redux for header badge

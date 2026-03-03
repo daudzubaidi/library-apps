@@ -1,5 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store';
 import { BookOpen, Users, ClipboardList, Clock, AlertCircle, CheckCircle } from 'lucide-react';
 import { getOverview } from '@/api/admin';
 import StatsCard from '@/components/StatsCard';
@@ -14,9 +16,12 @@ const ADMIN_TABS = [
 
 export default function Dashboard() {
   const location = useLocation();
+  const token = useSelector((state: RootState) => state.auth.token);
+
   const { data: overview, isLoading } = useQuery({
     queryKey: ['adminOverview'],
     queryFn: getOverview,
+    enabled: !!token,
   });
 
   return (

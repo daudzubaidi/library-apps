@@ -10,7 +10,7 @@ import dayjs from 'dayjs';
 export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAppSelector((state) => state.auth);
+  const { user, token } = useAppSelector((state) => state.auth);
   const queryClient = useQueryClient();
   const [borrowPurpose, setBorrowPurpose] = useState('');
   const [duration, setDuration] = useState<3 | 5 | 10>(3);
@@ -23,6 +23,7 @@ export default function Checkout() {
   const { data: cart } = useQuery({
     queryKey: ['cart'],
     queryFn: getCart,
+    enabled: !!token,
   });
 
   // Only show selected items in checkout

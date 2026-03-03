@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store';
 import { getMyLoans } from '@/api/me';
 import { returnBook } from '@/api/loans';
 import { BookOpen } from 'lucide-react';
@@ -16,12 +18,14 @@ const TABS = [
 
 export default function MyLoans() {
   const location = useLocation();
+  const token = useSelector((state: RootState) => state.auth.token);
   const [statusFilter, setStatusFilter] = useState<'all' | 'BORROWED' | 'RETURNED' | 'LATE'>('all');
   const queryClient = useQueryClient();
 
   const { data: loansData, isLoading } = useQuery({
     queryKey: ['myLoans', statusFilter],
     queryFn: () => getMyLoans({ status: statusFilter === 'all' ? undefined : statusFilter }),
+    enabled: !!token,
   });
 
   const returnBookMutation = useMutation({

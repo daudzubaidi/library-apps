@@ -26,7 +26,7 @@ export default function MyProfile() {
   const location = useLocation();
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
-  const { user } = useAppSelector((state) => state.auth);
+  const { user, token } = useAppSelector((state) => state.auth);
 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user?.name || '');
@@ -37,6 +37,7 @@ export default function MyProfile() {
   const { data: profile, isLoading } = useQuery({
     queryKey: ['myProfile'],
     queryFn: getProfile,
+    enabled: !!token,
   });
 
   const updateMutation = useMutation({

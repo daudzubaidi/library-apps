@@ -1,6 +1,8 @@
 import dayjs from 'dayjs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store';
 import { getMyReviews } from '@/api/me';
 import { deleteReview } from '@/api/reviews';
 import { Star, Trash2, MessageSquare } from 'lucide-react';
@@ -16,10 +18,12 @@ const TABS = [
 export default function MyReviews() {
   const location = useLocation();
   const queryClient = useQueryClient();
+  const token = useSelector((state: RootState) => state.auth.token);
 
   const { data: reviewsData, isLoading } = useQuery({
     queryKey: ['myReviews'],
     queryFn: () => getMyReviews(),
+    enabled: !!token,
   });
 
   const deleteReviewMutation = useMutation({
