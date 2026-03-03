@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ProtectedRoute, AdminRoute } from '@/components/ProtectedRoute';
@@ -68,14 +67,9 @@ function AnimatedOutlet() {
 
 export default function App() {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
-  const { refetch } = useProfile();
 
-  // Auto-fetch profile on mount if authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      refetch();
-    }
-  }, [isAuthenticated, refetch]);
+  // Only fetch profile when authenticated
+  useProfile(isAuthenticated);
 
   return <AnimatedOutlet />;
 }

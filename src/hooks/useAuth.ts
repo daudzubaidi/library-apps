@@ -26,11 +26,12 @@ export function useRegister() {
   });
 }
 
-export function useProfile() {
+export function useProfile(enabled = true) {
   const dispatch = useDispatch();
   const query = useQuery({
     queryKey: ['profile'],
     queryFn: getProfile,
+    enabled: enabled,
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
