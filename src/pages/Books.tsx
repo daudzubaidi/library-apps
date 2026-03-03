@@ -58,23 +58,35 @@ function CarouselDots({ total, active }: { total: number; active: number }) {
 export default function Books() {
   const [shownCount, setShownCount] = useState(10);
 
-  const { data: recommendations, isLoading: loadingRec } = useQuery({
+  const { data: recommendations, isLoading: loadingRec, error: recError } = useQuery({
     queryKey: ['recommendations'],
     queryFn: () => getRecommendedBooks({ limit: 20 }),
   });
 
-  const { data: categories } = useQuery({
+  const { data: categories, error: catError } = useQuery({
     queryKey: ['categories'],
     queryFn: getCategories,
   });
 
-  const { data: popularAuthors } = useQuery({
+  const { data: popularAuthors, error: authError } = useQuery({
     queryKey: ['popularAuthors'],
     queryFn: () => getPopularAuthors(4),
   });
 
   const visibleBooks = (recommendations?.data ?? []).slice(0, shownCount);
   const hasMore = (recommendations?.data?.length ?? 0) > shownCount;
+
+  // Show error state if any query fails
+  if (recError || catError || authError) {
+    return (
+      <div className="flex min-h-[400px] flex-col items-center justify-center gap-[16px]">
+        <BookOpen className="h-[48px] w-[48px]" style={{ color: 'var(--color-neutral-300)' }} />
+        <p className="text-md font-semibold" style={{ fontFamily: 'var(--font-family-quicksand)', color: 'var(--color-neutral-500)' }}>
+          Failed to load content. Please refresh the page.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-full flex-col">
@@ -188,7 +200,7 @@ export default function Books() {
             Popular Authors
           </h2>
           <div className="flex flex-wrap gap-[20px]">
-            {popularAuthors.map((author) => (
+            {popularAuthors.filter((a) => a && a.id && a.name).map((author) => (
               <Link
                 key={author.id}
                 to={`/authors/${author.id}`}
@@ -197,7 +209,7 @@ export default function Books() {
                 {/* Avatar */}
                 <div className="h-[48px] w-[48px] shrink-0 overflow-hidden rounded-full">
                   {author.photoUrl
-                    ? <img src={author.photoUrl} alt={author.name} className="h-full w-full object-cover" />
+                    ? <img src={author.photoUrl} alt={author.name} className="h-full w-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                     : (
                       <div className="flex h-full w-full items-center justify-center rounded-full" style={{ background: 'linear-gradient(135deg, var(--color-primary-300), #6B9BF8)' }}>
                         <span className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-family-quicksand)' }}>
