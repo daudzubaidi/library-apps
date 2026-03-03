@@ -28,7 +28,7 @@ const DROPDOWN_NAV = [
 ];
 
 export default function MainLayout() {
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { user, token } = useSelector((state: RootState) => state.auth);
   const cartCount = useSelector((state: RootState) => state.cart.itemCount);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -39,6 +39,7 @@ export default function MainLayout() {
   const { data: cart } = useQuery({
     queryKey: ['cart'],
     queryFn: getCart,
+    enabled: !!token,
     staleTime: 30 * 1000,
   });
 
